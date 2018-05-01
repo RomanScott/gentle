@@ -55,6 +55,13 @@ void ConfigFeatureInfo(kaldi::OnlineNnet2FeaturePipelineInfo& info,
     info.ivector_extractor_info.Check();
 }
 
+void ConfigDecoding(kaldi::OnlineNnet3DecodingConfig& config) {
+  config.decodable_opts.acoustic_scale = 1.0; // changed from 0.1?
+  config.decoder_opts.lattice_beam = 6.0;
+  config.decoder_opts.beam = 15.0;
+  config.decoder_opts.max_active = 7000;
+}
+
 void ConfigEndpoint(kaldi::OnlineEndpointConfig& config) {
   config.silence_phones = "1:2:3:4:5:6:7:8:9:10:11:12:13:14:15:16:17:18:19:20";
 }
@@ -66,12 +73,12 @@ int main(int argc, char *argv[]) {
     using namespace kaldi;
     using namespace fst;
 
-    setbuf(stdout, NULL);  
+    setbuf(stdout, NULL);
 
     std::string nnet_dir = "exp/tdnn_7b_chain_online";
     std::string graph_dir = nnet_dir + "/graph_pp";
     std::string fst_rxfilename = graph_dir + "/HCLG.fst";
-    
+
     if(argc == 3) {
       nnet_dir = argv[1];
       graph_dir = nnet_dir + "/graph_pp";
@@ -84,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     const std::string ivector_model_dir = nnet_dir + "/ivector_extractor";
     const std::string nnet3_rxfilename = nnet_dir + "/final.mdl";
-    
+
     const std::string word_syms_rxfilename = graph_dir + "/words.txt";
     const string word_boundary_filename = graph_dir + "/phones/word_boundary.int";
     const string phone_syms_rxfilename = graph_dir + "/phones.txt";
@@ -94,16 +101,11 @@ int main(int argc, char *argv[]) {
 
     OnlineNnet2FeaturePipelineInfo feature_info;
     ConfigFeatureInfo(feature_info, ivector_model_dir);
-    LatticeFasterDecoderConfig nnet3_decoding_config;
-
-    nnet3_decoding_config.lattice_beam = 6.0;
-    nnet3_decoding_config.beam = 15.0;
-    nnet3_decoding_config.max_active = 7000;
-
-    
+    OnlineNnet3DecodingConfig nnet3_decoding_config;
+    ConfigDecoding(nnet3_decoding_config);
     OnlineEndpointConfig endpoint_config;
     ConfigEndpoint(endpoint_config);
-    
+
 
     BaseFloat frame_shift = feature_info.FrameShiftInSeconds();
 
@@ -115,7 +117,7 @@ int main(int argc, char *argv[]) {
       trans_model.Read(ki.Stream(), binary);
       am_nnet.Read(ki.Stream(), binary);
     }
-    
+
     fst::Fst<fst::StdArc> *decode_fst = ReadFstKaldi(fst_rxfilename);
 
     fst::SymbolTable *word_syms =
@@ -123,8 +125,8 @@ int main(int argc, char *argv[]) {
 
     fst::SymbolTable* phone_syms =
       fst::SymbolTable::ReadText(phone_syms_rxfilename);
-    
-    
+
+
     OnlineIvectorExtractorAdaptationState adaptation_state(feature_info.ivector_extractor_info);
 
     OnlineNnet2FeaturePipeline feature_pipeline(feature_info);
@@ -133,17 +135,10 @@ int main(int argc, char *argv[]) {
     OnlineSilenceWeighting silence_weighting(
                                              trans_model,
                                              feature_info.silence_weighting_config);
-    nnet3::NnetSimpleLoopedComputationOptions decodable_opts;
-    
-
-    nnet3::NnetSimpleLoopedComputationOptions nnetopts;
-    nnetopts.acoustic_scale = 1.0;
-    nnet3::DecodableNnetSimpleLoopedInfo decodable_info(nnetopts,
-                                                        &am_nnet);
 
     SingleUtteranceNnet3Decoder decoder(nnet3_decoding_config,
                                         trans_model,
-                                        decodable_info,
+                                        am_nnet,
                                         *decode_fst,
                                         &feature_pipeline);
 
@@ -160,15 +155,14 @@ int main(int argc, char *argv[]) {
     else if(strcmp(cmd,"reset\n") == 0) {
       feature_pipeline.~OnlineNnet2FeaturePipeline();
       new (&feature_pipeline) OnlineNnet2FeaturePipeline(feature_info);
-      
+
       decoder.~SingleUtteranceNnet3Decoder();
       new (&decoder) SingleUtteranceNnet3Decoder(nnet3_decoding_config,
-                                        trans_model,
-                                        decodable_info,
-                                        *decode_fst,
-                                        &feature_pipeline);
+                                                 trans_model,
+                                                 am_nnet,
+                                                 *decode_fst,
+                                                 &feature_pipeline);
     }
-      
     else if(strcmp(cmd,"push-chunk\n") == 0) {
 
       // Get chunk length from python
@@ -176,11 +170,11 @@ int main(int argc, char *argv[]) {
       fgets(cmd, sizeof(cmd), stdin);
       sscanf(cmd, "%d\n", &chunk_len);
 
-      int16_t audio_chunk[chunk_len];  
+      int16_t audio_chunk[chunk_len];
       Vector<BaseFloat> wave_part = Vector<BaseFloat>(chunk_len);
-      
+
       fread(&audio_chunk, 2, chunk_len, stdin);
-      
+
       // We need to copy this into the `wave_part' Vector<BaseFloat> thing.
       // From `gst-audio-source.cc' in gst-kaldi-nnet2
       for (int i = 0; i < chunk_len ; ++i) {
@@ -194,7 +188,7 @@ int main(int argc, char *argv[]) {
         silence_weighting.ComputeCurrentTraceback(decoder.Decoder());
         silence_weighting.GetDeltaWeights(feature_pipeline.NumFramesReady(),
                                           &delta_weights);
-        feature_pipeline.IvectorFeature()->UpdateFrameWeights(delta_weights);
+        feature_pipeline.UpdateFrameWeights(delta_weights);
       }
 
       decoder.AdvanceDecoding();
@@ -203,13 +197,13 @@ int main(int argc, char *argv[]) {
     }
     else if(strcmp(cmd, "get-final\n") == 0) {
       feature_pipeline.InputFinished(); // XXX: this is new: what does it do?
-      
+
       decoder.FinalizeDecoding();
 
       Lattice final_lat;
       decoder.GetBestPath(true, &final_lat);
       CompactLattice clat;
-      ConvertLattice(final_lat, &clat);      
+      ConvertLattice(final_lat, &clat);
 
       // Compute prons alignment (see: kaldi/latbin/nbest-to-prons.cc)
       CompactLattice aligned_clat;
@@ -242,12 +236,12 @@ int main(int argc, char *argv[]) {
       }
 
       fprintf(stdout, "done with words\n");
-      
+
     }
     else {
 
       fprintf(stderr, "unknown command %s\n", cmd);
-      
+
     }
   }
 }
