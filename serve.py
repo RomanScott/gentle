@@ -8,6 +8,7 @@ import json
 import logging
 import multiprocessing
 import os
+import psutil
 import shutil
 import uuid
 import wave
@@ -136,6 +137,11 @@ class TranscriptionsController(Resource):
         return trans_ctrl
 
     def render_POST(self, req):
+        free_space = psutil.disk_usage(".").free / (1024 * 1024)
+
+        if free_space < 250:
+            shutil.rmtree(os.path.join(self.transcriber.data_dir, 'transcriptions'))
+
         uid = self.transcriber.next_id()
 
         tran = req.args.get('transcript', [''])[0]
