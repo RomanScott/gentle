@@ -15,5 +15,5 @@ setup(
     author='Robert M Ochshorn',
     license='MIT',
     packages=['gentle'],
-    install_requires=['twisted'],
+    install_requires=['twisted', 'psutil'],
 )
