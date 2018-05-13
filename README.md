@@ -1,5 +1,7 @@
 # Gentle
-**Robust yet lenient forced-aligner built on Kaldi. A tool for aligning speech with text. Modified by Roman Scott for the Nofanity application.**
+**Robust yet lenient forced-aligner built on Kaldi. A tool for aligning speech with text.**
+
+Modified by Roman Scott for the Nofanity application.
 
 ## Getting Started
 
