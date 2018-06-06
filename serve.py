@@ -10,6 +10,7 @@ import multiprocessing
 import os
 import psutil
 import shutil
+import sys
 import uuid
 import wave
 
@@ -137,6 +138,15 @@ class TranscriptionsController(Resource):
         return trans_ctrl
 
     def render_POST(self, req):
+        if "stop" in req.args and req.args["stop"][0]:
+            req.setHeader("Content-Type", "application/json")
+            req.write("{ message: PROCESS_ENDED }")
+            req.finish()
+            
+            os.system("pkill -f ext/k3")
+            reactor.stop()
+            sys.exit(0)
+
         free_space = psutil.disk_usage(".").free / (1024 * 1024)
 
         if free_space < 250:
