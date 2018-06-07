@@ -10,6 +10,7 @@ import multiprocessing
 import os
 import psutil
 import shutil
+import subprocess
 import sys
 import uuid
 import wave
@@ -142,9 +143,10 @@ class TranscriptionsController(Resource):
             req.setHeader("Content-Type", "application/json")
             req.write("{ message: PROCESS_ENDED }")
             req.finish()
-            
+
             os.system("pkill -f ext/k3")
             reactor.stop()
+            subprocess.Popen(["sleep 1 && ./gentle"], shell=True, cwd=os.path.dirname(sys.executable))
             sys.exit(0)
 
         free_space = psutil.disk_usage(".").free / (1024 * 1024)
