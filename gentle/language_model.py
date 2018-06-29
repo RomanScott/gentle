@@ -10,7 +10,8 @@ from util.paths import get_binary
 from metasentence import MetaSentence
 from resources import Resources
 
-MKGRAPH_PATH = get_binary("ext/m3")
+BINARY_PATH = "ext/m3.exe" if os.name == "nt" else "ext/m3"
+MKGRAPH_PATH = get_binary(BINARY_PATH)
 
 # [oov] no longer in words.txt
 OOV_TERM = '<unk>'

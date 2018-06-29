@@ -2,7 +2,8 @@ import subprocess
 from util.paths import get_binary
 import os
 
-EXECUTABLE_PATH = get_binary("ext/k3")
+BINARY_PATH = "ext/k3.exe" if os.name == "nt" else "ext/k3"
+EXECUTABLE_PATH = get_binary(BINARY_PATH)
 
 class Kaldi:
     def __init__(self, nnet_dir=None, hclg_path=None, proto_langdir=None):

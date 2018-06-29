@@ -1,14 +1,18 @@
 # -*- mode: python -*-
 
+import os
+
 block_cipher = None
 
+k3Exe = 'ext/k3.exe' if os.name == 'nt' else 'ext/k3'
+m3Exe = 'ext/m3.exe' if os.name == 'nt' else 'ext/m3'
 
 a = Analysis(['serve.py'],
-             pathex=['/root/Desktop/gentle'],
+             pathex=[os.path.dirname(os.path.abspath(__file__))],
              binaries=[],
              datas=[
-             ('ext/k3', 'ext'),
-             ('ext/m3', 'ext'),
+             (k3Exe, 'ext'),
+             (m3Exe, 'ext'),
              ('www', 'www'),
              ('exp', 'exp'),
              ('COPYING', '.'),
