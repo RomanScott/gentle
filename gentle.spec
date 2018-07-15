@@ -9,7 +9,7 @@ m3Exe = 'ext/gentleM3.exe' if os.name == 'nt' else 'ext/gentleM3'
 ffmpegExe = 'ext/ffmpeg.exe' if os.name == 'nt' else 'ext/ffmpeg'
 
 a = Analysis(['serve.py'],
-             pathex=[os.path.dirname(os.path.abspath(__file__))],
+             pathex=[os.getcwd()],
              binaries=[],
              datas=[
              (k3Exe, 'ext'),

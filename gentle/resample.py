@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from util.paths import get_binary
 
 BINARY_PATH = "ext/ffmpeg.exe" if os.name == "nt" else "ext/ffmpeg"
-FFMPEG = get_binary(BINARY_PATH )
+FFMPEG = get_binary(BINARY_PATH)
 
 def resample(infile, outfile):
     if not os.path.isfile(infile):
