@@ -8,10 +8,17 @@ ext/.depend.mk
 *.pyc
 *~
 webdata/
+gentle.egg-info/
+exp/
+ext/gentleK3
+ext/gentleM3
+ext/ffmpeg
 
 
 
 #######    Python    ######
+
+.DS_STORE
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

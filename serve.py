@@ -144,9 +144,15 @@ class TranscriptionsController(Resource):
             req.write("{ message: PROCESS_ENDED }")
             req.finish()
 
-            os.system("pkill -f ext/k3")
+            KILL_CMD = "taskkill /F /IM gentleK3.exe /T" if os.name == "nt" else "pkill -f gentleK3"
+            RESTART_CMD = "timeout 1 && gentle" if os.name == "nt" else "sleep 1 && ./gentle"
+
+            os.system(KILL_CMD)
             reactor.stop()
-            subprocess.Popen(["sleep 1 && ./gentle"], shell=True, cwd=os.path.dirname(sys.executable))
+
+            if "noRestart" not in req.args:
+                subprocess.Popen([RESTART_CMD], shell=True, cwd=os.path.dirname(sys.executable))
+
             sys.exit(0)
 
         free_space = psutil.disk_usage(".").free / (1024 * 1024)

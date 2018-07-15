@@ -4,8 +4,9 @@ import os
 
 block_cipher = None
 
-k3Exe = 'ext/k3.exe' if os.name == 'nt' else 'ext/k3'
-m3Exe = 'ext/m3.exe' if os.name == 'nt' else 'ext/m3'
+k3Exe = 'ext/gentleK3.exe' if os.name == 'nt' else 'ext/gentleK3'
+m3Exe = 'ext/gentleM3.exe' if os.name == 'nt' else 'ext/gentleM3'
+ffmpegExe = 'ext/ffmpeg.exe' if os.name == 'nt' else 'ext/ffmpeg'
 
 a = Analysis(['serve.py'],
              pathex=[os.path.dirname(os.path.abspath(__file__))],
@@ -13,6 +14,7 @@ a = Analysis(['serve.py'],
              datas=[
              (k3Exe, 'ext'),
              (m3Exe, 'ext'),
+             (ffmpegExe, 'ext'),
              ('www', 'www'),
              ('exp', 'exp'),
              ('COPYING', '.'),
