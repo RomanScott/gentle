@@ -14,6 +14,7 @@ import subprocess
 import sys
 import uuid
 import wave
+import time
 
 from gentle.util.paths import get_resource, get_datadir
 from gentle.util.cyst import Insist
@@ -139,10 +140,12 @@ class TranscriptionsController(Resource):
         return trans_ctrl
 
     def render_POST(self, req):
-        if "stop" in req.args and req.args["stop"][0]:
+        def quitGentle(restart):
             req.setHeader("Content-Type", "application/json")
             req.write("{ message: PROCESS_ENDED }")
             req.finish()
+
+            time.sleep(0.5)
 
             KILL_CMD = "taskkill /F /IM gentleK3.exe /T" if os.name == "nt" else "pkill -f gentleK3"
             RESTART_CMD = "timeout 1 && gentle" if os.name == "nt" else "sleep 1 && ./gentle"
@@ -150,10 +153,15 @@ class TranscriptionsController(Resource):
             os.system(KILL_CMD)
             reactor.stop()
 
-            if "noRestart" not in req.args:
+            if restart is True:
                 subprocess.Popen([RESTART_CMD], shell=True, cwd=os.path.dirname(sys.executable))
 
             sys.exit(0)
+
+        if "stop" in req.args and req.args["stop"][0]:
+            quitGentle(True)
+        if "stopNoRestart" in req.args and req.args["stopNoRestart"][0]:
+            quitGentle(False)
 
         free_space = psutil.disk_usage(".").free / (1024 * 1024)
 
@@ -268,6 +276,8 @@ def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, n
 
 
 if __name__=='__main__':
+    multiprocessing.freeze_support()
+
     import argparse
 
     parser = argparse.ArgumentParser(
