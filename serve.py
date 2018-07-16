@@ -68,7 +68,7 @@ class Transcriber():
         with open(tran_path, 'w') as tranfile:
             tranfile.write(transcript)
         audio_path = os.path.join(outdir, 'upload')
-        with open(audio_path, 'w') as wavfile:
+        with open(audio_path, 'wb') as wavfile:
             wavfile.write(audio)
 
         status['status'] = 'ENCODING'
@@ -85,7 +85,7 @@ class Transcriber():
 
         #XXX: Maybe we should pass this wave object instead of the
         # file path to align_progress
-        wav_obj = wave.open(wavfile, 'r')
+        wav_obj = wave.open(wavfile, 'rb')
         status['duration'] = wav_obj.getnframes() / float(wav_obj.getframerate())
         status['status'] = 'TRANSCRIBING'
 

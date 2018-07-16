@@ -40,7 +40,7 @@ def realign(wavfile, alignment, ms, resources, nthreads=4, progress_cb=None):
     realignments = []
 
     def realign(chunk):
-        wav_obj = wave.open(wavfile, 'r')
+        wav_obj = wave.open(wavfile, 'rb')
 
         if chunk["start"] is None:
             start_t = 0
@@ -71,7 +71,7 @@ def realign(wavfile, alignment, ms, resources, nthreads=4, progress_cb=None):
             chunk_gen_hclg_filename,
             resources.proto_langdir)
 
-        wav_obj = wave.open(wavfile, 'r')
+        wav_obj = wave.open(wavfile, 'rb')
         wav_obj.setpos(int(start_t * wav_obj.getframerate()))
         buf = wav_obj.readframes(int(duration * wav_obj.getframerate()))
 

@@ -15,14 +15,14 @@ class MultiThreadedTranscriber:
         self.kaldi_queue = kaldi_queue
 
     def transcribe(self, wavfile, progress_cb=None):
-        wav_obj = wave.open(wavfile, 'r')
+        wav_obj = wave.open(wavfile, 'rb')
         duration = wav_obj.getnframes() / float(wav_obj.getframerate())
         n_chunks = int(math.ceil(duration / float(self.chunk_len - self.overlap_t)))
 
         chunks = []
 
         def transcribe_chunk(idx):
-            wav_obj = wave.open(wavfile, 'r')
+            wav_obj = wave.open(wavfile, 'rb')
             start_t = idx * (self.chunk_len - self.overlap_t)
             # Seek
             wav_obj.setpos(int(start_t * wav_obj.getframerate()))
