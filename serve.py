@@ -285,7 +285,7 @@ if __name__=='__main__':
                        help='host to run http server on')
     parser.add_argument('--port', default=8765, type=int,
                         help='port number to run http server on')
-    parser.add_argument('--nthreads', default=int(multiprocessing.cpu_count() * 0.75), type=int,
+    parser.add_argument('--nthreads', default=1 if multiprocessing.cpu_count() is 1 else int(multiprocessing.cpu_count() * 0.75), type=int,
                         help='number of alignment threads')
     parser.add_argument('--ntranscriptionthreads', default=2, type=int,
                         help='number of full-transcription threads (memory intensive)')

@@ -7,11 +7,7 @@ block_cipher = None
 k3Exe = 'ext/gentleK3.exe' if os.name == 'nt' else 'ext/gentleK3'
 m3Exe = 'ext/gentleM3.exe' if os.name == 'nt' else 'ext/gentleM3'
 ffmpegExe = 'ext/ffmpeg.exe' if os.name == 'nt' else 'ext/ffmpeg'
-
-a = Analysis(['serve.py'],
-             pathex=[os.getcwd()],
-             binaries=[],
-             datas=[
+datasMac = [
              (k3Exe, 'ext'),
              (m3Exe, 'ext'),
              (ffmpegExe, 'ext'),
@@ -19,7 +15,27 @@ a = Analysis(['serve.py'],
              ('exp', 'exp'),
              ('COPYING', '.'),
              ('README.md', '.')
-             ],
+           ]
+datasWindows = [
+             (k3Exe, 'ext'),
+             (m3Exe, 'ext'),
+             (ffmpegExe, 'ext'),
+             ('ext/libgcc_s_seh-1.dll', 'ext'),
+             ('ext/libgfortran-3.dll', 'ext'),
+             ('ext/libopenblas.dll', 'ext'),
+             ('ext/libquadmath-0.dll', 'ext'),
+             ('ext/openfst64.dll', 'ext'),
+             ('ext/pthreadVC2.dll', 'ext'),
+             ('www', 'www'),
+             ('exp', 'exp'),
+             ('COPYING', '.'),
+             ('README.md', '.')
+           ]
+
+a = Analysis(['serve.py'],
+             pathex=[os.getcwd()],
+             binaries=[],
+             datas=datasWindows if os.name == 'nt' else datasMac,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
