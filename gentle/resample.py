@@ -5,11 +5,9 @@ import tempfile
 
 from contextlib import contextmanager
 
-
 from util.paths import get_binary
 
-BINARY_NAME = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
-BINARY_PATH = os.path.join(os.path.dirname(sys.executable), "ffmpeg", BINARY_NAME)
+BINARY_PATH = os.path.join("ffmpeg", "ffmpeg.exe" if os.name == "nt" else "ffmpeg")
 FFMPEG = get_binary(BINARY_PATH)
 
 def resample(infile, outfile):
@@ -25,7 +23,7 @@ def resample(infile, outfile):
                             '-i', infile,
                             '-ac', '1', '-ar', '8000',
                             '-acodec', 'pcm_s16le',
-                            outfile])
+                            outfile], cwd=os.path.dirname(sys.executable))
 
 @contextmanager
 def resampled(infile):
