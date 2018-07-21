@@ -4,6 +4,8 @@ from twisted.web.server import Site, NOT_DONE_YET
 from twisted.internet import reactor, threads
 from twisted.web._responses import FOUND
 
+import argparse
+import ctypes
 import json
 import logging
 import multiprocessing
@@ -278,9 +280,18 @@ def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, n
     reactor.run(installSignalHandlers=installSignalHandlers)
 
 
+def hideConsole():
+    whnd = ctypes.windll.kernel32.GetConsoleWindow()
+
+    if whnd != 0:
+        ctypes.windll.user32.ShowWindow(whnd, 0)
+
+
 if __name__=='__main__':
     multiprocessing.freeze_support()
-    import argparse
+
+    if os.name == "nt" and getattr(sys, "frozen", False):
+        hideConsole()
 
     parser = argparse.ArgumentParser(
         description='Align a transcript to audio by generating a new language model.')
