@@ -150,16 +150,17 @@ class TranscriptionsController(Resource):
             time.sleep(0.5)
 
             KILL_CMD = "taskkill /F /IM gentleK3.exe /T" if os.name == "nt" else "pkill -f gentleK3"
-            RESTART_CMD = ["timeout", "1", "&&", "gentle"] if os.name == "nt" else ["sleep 1 && ./gentle"]
+            RESTART_CMD_WIN = ["timeout", "1", "&&", "START", "/min", "cursesearch.exe"]
+            RESTART_CMD_MAC = ["sleep 1 && nohup ./cursesearch </dev/null >/dev/null 2>&1 &"]
 
             os.system(KILL_CMD)
             reactor.stop()
 
             if restart is True:
                 if os.name == "nt":
-                    subprocess.Popen(RESTART_CMD, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True, cwd=os.path.dirname(sys.executable))
+                    subprocess.Popen(RESTART_CMD_WIN, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True, cwd=os.path.dirname(sys.executable))
                 else:
-                    subprocess.Popen(RESTART_CMD, shell=True, cwd=os.path.dirname(sys.executable))
+                    subprocess.Popen(RESTART_CMD_MAC, shell=True, cwd=os.path.dirname(sys.executable))
 
             sys.exit(0)
 

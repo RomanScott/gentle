@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 import tempfile
 
 from contextlib import contextmanager
@@ -7,7 +8,8 @@ from contextlib import contextmanager
 
 from util.paths import get_binary
 
-BINARY_PATH = "ext\\ffmpeg.exe" if os.name == "nt" else "ext/ffmpeg"
+BINARY_NAME = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
+BINARY_PATH = os.path.join(os.path.dirname(sys.executable), "ffmpeg", BINARY_NAME)
 FFMPEG = get_binary(BINARY_PATH)
 
 def resample(infile, outfile):
