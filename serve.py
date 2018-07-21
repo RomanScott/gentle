@@ -149,11 +149,13 @@ class TranscriptionsController(Resource):
 
             time.sleep(0.5)
 
-            KILL_CMD = "taskkill /F /IM gentleK3.exe /T" if os.name == "nt" else "pkill -f gentleK3"
+            KILL_CMD_K3 = "taskkill /F /IM gentleK3.exe /T" if os.name == "nt" else "pkill -f gentleK3"
+            KILL_CMD_M3 = "taskkill /F /IM gentleM3.exe /T" if os.name == "nt" else "pkill -f gentleM3"
             RESTART_CMD_WIN = ["timeout", "1", "&&", "START", "/min", "cursesearch.exe"]
             RESTART_CMD_MAC = ["sleep 1 && nohup ./cursesearch </dev/null >/dev/null 2>&1 &"]
 
-            os.system(KILL_CMD)
+            os.system(KILL_CMD_K3)
+            os.system(KILL_CMD_M3)
             reactor.stop()
 
             if restart is True:
