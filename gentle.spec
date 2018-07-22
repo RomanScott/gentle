@@ -23,6 +23,7 @@ datasWindows = [
              ('ext/libquadmath-0.dll', 'ext'),
              ('ext/openfst64.dll', 'ext'),
              ('ext/pthreadVC2.dll', 'ext'),
+             ('ext/msvcr100.dll', 'ext'),
              ('www', 'www'),
              ('exp', 'exp'),
              ('COPYING', '.'),
