@@ -18,7 +18,7 @@ Then go inside ```kaldi/src``` and create a folder called ```gentle```, and copy
 
 Go back to ```kaldi/src``` and to the parent Makefile: add the word gentle at the end of the line ```SUBDIRS = ``` and at the end of the line after "The tools depend on all the libraries".
 
-After this, follow the [compilation instructions for Kaldi on Windows](https://github.com/kaldi-asr/kaldi/blob/21cfe99c5e08a35eb410ce3cc28d150fd4cb7505/windows/INSTALL.md).
+After this, follow the [compilation instructions for Kaldi on Windows](https://github.com/kaldi-asr/kaldi/blob/21cfe99c5e08a35eb410ce3cc28d150fd4cb7505/windows/INSTALL.md). **NOTE:** Set Runtime Options to Multithreaded (/MT) instead of Multithreaded DLL (/MD)
 
 Grab your k3.exe and m3.exe files from the built solution, rename them to gentleK3.exe and gentleM3.exe, and move them into ```ext```. Then run ```pyinstaller gentle.spec``` and, in the ```dist``` folder generated, run ```gentle.exe``` to start the server.
 
